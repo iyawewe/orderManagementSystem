@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "github.com/iyawewe/orderManagementSystem/common/api";
+package api;
+
+message Order {
+    string id = 1;
+    string customerID = 2;
+    string status = 3;
+    repeated ItemsWithQuantity items = 4;
+}
+
+service OrderService {
+    rpc CreateOrder (CreateOrderRequest) returns (Order);
+}
+
+message ItemsWithQuantity {
+    string id = 1;
+    string name = 2;
+    int32 quantity = 3;
+    string priceId = 4;
+}
+
+message CreateOrderRequest {
+    string customerID = 1;
+    repeated ItemsWithQuantity items = 2;
+}
