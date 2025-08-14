@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	"github.com/iyawewe/orderManagementSystem/common"
+	pb "github.com/iyawewe/orderManagementSystem/common/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
 	httpAddr         = common.EnvString("HTTP_ADDR", ":8080")
-	orderServiceAddr = "localhost:3000"
+	orderServiceAddr = "localhost:2000"
 )
 
 func main() {

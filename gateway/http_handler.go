@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/iyawewe/orderManagementSystem/common/api"
 	pb "github.com/iyawewe/orderManagementSystem/common/api"
 )
 
@@ -14,20 +16,20 @@ func NewHandler(client pb.OrderServiceClient) *handler {
 }
 func (h *handler) registerRoutes(mux *http.ServeMux) {
 
-	mux.HandleFunc("POST /api/customers/{customersID}/orders", h.HandlerCreateOrder)
-}
-
-var items []*pb.ItemsWithQuantity
-if err := common.ReadJSON(r,&items);err!=nil{
-	common.WriteError(w,http.StatusBadRequest,err.Error())
-	return
+	mux.HandleFunc("POST /api/customers/{customerID}/orders", h.HandlerCreateOrder)
 }
 
 func (h *handler) HandlerCreateOrder(w http.ResponseWriter, r *http.Request) {
 	customerID := r.PathValue("customerID")
 
-	h.client.CreateOrder(r.Context(),&pb.CreateOrderRequest){
-		CustomerId: customerID,
-		Items: items,
+	var items []*pb.ItemsWithQuantity
+	if err := api.ReadJSON(r, &items); err != nil {
+		api.WriteError(w, http.StatusBadRequest, err.Error())
+		return
 	}
+
+	h.client.CreateOrder(r.Context(), &pb.CreateOrderRequest{
+		CustomerID: customerID,
+		Items:      items,
+	})
 }
