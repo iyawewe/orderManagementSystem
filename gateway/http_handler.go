@@ -6,6 +6,8 @@ import (
 
 	"github.com/iyawewe/orderManagementSystem/common/api"
 	pb "github.com/iyawewe/orderManagementSystem/common/api"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type handler struct {
@@ -28,7 +30,6 @@ func (h *handler) HandlerCreateOrder(w http.ResponseWriter, r *http.Request) {
 		api.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	if err := validateItems(items); err != nil {
 		api.WriteError(w, http.StatusBadRequest, err.Error())
 		return
@@ -38,6 +39,11 @@ func (h *handler) HandlerCreateOrder(w http.ResponseWriter, r *http.Request) {
 		CustomerID: customerID,
 		Items:      items,
 	})
+	rStatus := status.Convert(err)
+	if rStatus.Code() != codes.InvalidArgument {
+		api.WriteError(w, http.StatusBadRequest, rStatus.Message())
+		return
+	}
 	if err != nil {
 		api.WriteError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -48,7 +54,7 @@ func (h *handler) HandlerCreateOrder(w http.ResponseWriter, r *http.Request) {
 
 func validateItems(items []*pb.ItemsWithQuantity) error {
 	if len(items) == 0 {
-		return errors.New("items must have at least one item")
+		return api.ErrNoItems
 	}
 	for _, i := range items {
 		if i.Id == "" {
